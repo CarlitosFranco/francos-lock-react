@@ -11,6 +11,7 @@ const Inventario = () => {
   const [modalFoto, setModalFoto] = useState(null);
   const [alerta, setAlerta] = useState(null);
   const [cargando, setCargando] = useState(true);
+  const [editandoCodigo, setEditandoCodigo] = useState(null); // ← NUEVO: saber si estamos editando
   
   const [formData, setFormData] = useState({
     codigo: '',
@@ -35,7 +36,6 @@ const Inventario = () => {
       if (marcaA < marcaB) return -1;
       if (marcaA > marcaB) return 1;
       
-      // Si la marca es igual, ordenar por nombre
       const nombreA = (a.nombre || "").toLowerCase();
       const nombreB = (b.nombre || "").toLowerCase();
       if (nombreA < nombreB) return -1;
@@ -112,7 +112,28 @@ const Inventario = () => {
   };
 
   // ============================================
-  // GUARDAR PRODUCTO
+  // EDITAR PRODUCTO (Cargar datos en el formulario)
+  // ============================================
+  const editarProducto = (producto) => {
+    setEditandoCodigo(producto.codigo);
+    setFormData({
+      codigo: producto.codigo,
+      nombre: producto.nombre,
+      marca: producto.marca || '',
+      stock: producto.stock,
+      precioCompra: producto.precioCompra || '',
+      precioVenta: producto.precioVenta || '',
+      stockMinimo: producto.stockMinimo || 2,
+      notas: producto.notas || '',
+      foto: producto.foto || ''
+    });
+    
+    document.querySelector('.form-container')?.scrollIntoView({ behavior: 'smooth' });
+    mostrarAlerta('✏️ Editando producto. Modifica los datos y guarda.', 'info');
+  };
+
+  // ============================================
+  // HANDLE SUBMIT (UNIFICADO - Crear o Actualizar)
   // ============================================
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -122,10 +143,36 @@ const Inventario = () => {
       return;
     }
 
-    const productoExistente = productos.find(p => 
-      p.codigo === formData.codigo.toUpperCase()
-    );
-
+    const codigoUpper = formData.codigo.toUpperCase();
+    
+    // Si estamos EDITANDO un producto existente
+    if (editandoCodigo) {
+      try {
+        await guardarProducto({
+          codigo: codigoUpper,
+          nombre: formData.nombre,
+          marca: formData.marca,
+          stock: parseInt(formData.stock) || 0,
+          precioCompra: parseFloat(formData.precioCompra) || 0,
+          precioVenta: parseFloat(formData.precioVenta) || 0,
+          stockMinimo: parseInt(formData.stockMinimo) || 2,
+          notas: formData.notas,
+          foto: formData.foto
+        });
+        
+        mostrarAlerta('✅ Producto actualizado correctamente', 'success');
+        setEditandoCodigo(null);
+        limpiarFormulario();
+        cargarProductos();
+      } catch (error) {
+        console.error(error);
+        mostrarAlerta('❌ Error al actualizar el producto', 'error');
+      }
+      return;
+    }
+    
+    // Si es un NUEVO producto
+    const productoExistente = productos.find(p => p.codigo === codigoUpper);
     if (productoExistente) {
       mostrarAlerta('❌ Ya existe un producto con ese código', 'error');
       return;
@@ -133,7 +180,7 @@ const Inventario = () => {
 
     try {
       await guardarProducto({
-        codigo: formData.codigo.toUpperCase(),
+        codigo: codigoUpper,
         nombre: formData.nombre,
         marca: formData.marca,
         stock: parseInt(formData.stock) || 0,
@@ -196,6 +243,7 @@ const Inventario = () => {
   // LIMPIAR FORMULARIO
   // ============================================
   const limpiarFormulario = () => {
+    setEditandoCodigo(null);
     setFormData({
       codigo: '',
       nombre: '',
@@ -231,7 +279,6 @@ const Inventario = () => {
     <div className="container">
       {alerta && <Alerta {...alerta} onClose={() => setAlerta(null)} />}
       
-      {/* Header con logo */}
       <div style={{ 
         display: 'flex', 
         alignItems: 'center', 
@@ -257,7 +304,7 @@ const Inventario = () => {
 
       <h1>📋 Control de Inventario</h1>
 
-      {/* Tarjetas de estadísticas - NUEVO */}
+      {/* Tarjetas de estadísticas */}
       <div className="stats-grid">
         <div className="stat-card">
           <div className="stat-icon">📦</div>
@@ -294,15 +341,16 @@ const Inventario = () => {
           productos={productosFiltrados}
           onActualizarStock={actualizarStock}
           onEliminar={eliminarProductoHandler}
+          onEditar={editarProducto}  // ← IMPORTANTE: pasar la función
           onVerFoto={setModalFoto}
           modalFoto={modalFoto}
           setModalFoto={setModalFoto}
         />
       </div>
       
-      {/* Formulario para agregar productos */}
+      {/* Formulario para agregar/editar productos */}
       <div className="form-container">
-        <h2>➕ Agregar Nuevo Producto</h2>
+        <h2>{editandoCodigo ? '✏️ Editar Producto' : '➕ Agregar Nuevo Producto'}</h2>
         
         <form onSubmit={handleSubmit}>
           <div className="form-grid">
@@ -314,8 +362,10 @@ const Inventario = () => {
                 value={formData.codigo} 
                 onChange={handleInputChange} 
                 placeholder="Ej: REN-CLIO-2015"
+                disabled={editandoCodigo !== null}
                 required
               />
+              {editandoCodigo && <small style={{ color: '#666' }}>El código no se puede modificar en edición</small>}
             </div>
             
             <div className="form-group">
@@ -325,7 +375,7 @@ const Inventario = () => {
                 id="nombre" 
                 value={formData.nombre} 
                 onChange={handleInputChange} 
-                placeholder="Ej: Llave Renault Clio"
+                placeholder="Ej: Carcasa Renault Clio"
                 required
               />
             </div>
@@ -411,7 +461,7 @@ const Inventario = () => {
           
           <div style={{ textAlign: 'center', marginTop: '20px' }}>
             <button type="submit" className="primary" style={{ padding: '12px 40px', fontSize: '16px' }}>
-              ✅ GUARDAR PRODUCTO
+              {editandoCodigo ? '✏️ ACTUALIZAR PRODUCTO' : '✅ GUARDAR PRODUCTO'}
             </button>
             <button 
               type="button" 

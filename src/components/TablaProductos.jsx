@@ -5,6 +5,7 @@ const TablaProductos = ({
   productos, 
   onActualizarStock, 
   onEliminar, 
+  onEditar,  // ← NUEVO: función para editar
   onVerFoto,
   modalFoto,
   setModalFoto
@@ -121,6 +122,17 @@ const TablaProductos = ({
                       -1
                     </button>
                     <button 
+                      onClick={() => onEditar(producto)}  // ← NUEVO: botón editar
+                      style={{ 
+                        background: '#0066cc',
+                        padding: '8px 12px',
+                        fontSize: '14px'
+                      }}
+                      title="Editar producto"
+                    >
+                      ✏️
+                    </button>
+                    <button 
                       onClick={() => onEliminar(producto.codigo)}
                       style={{ 
                         background: '#dc3545',
@@ -159,12 +171,15 @@ const TablaProductos = ({
           <span>Incrementar stock</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-          <span style={{ color: '#dc3545' }}>⬇️</span>
-          <span>Reducir stock</span>
+          <span style={{ color: '#0066cc' }}>✏️</span>
+          <span>Editar producto</span>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+          <span style={{ color: '#dc3545' }}>🗑️</span>
+          <span>Eliminar producto</span>
         </div>
       </div>
 
-      {/* Modal para foto */}
       {modalFoto && (
         <ModalFoto 
           foto={modalFoto} 
