@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { obtenerProductos, guardarProducto, eliminarProducto } from '../services/db';
 import TablaProductos from '../components/TablaProductos';
 import Alerta from '../components/Alerta';
@@ -23,7 +23,18 @@ const Inventario = () => {
     foto: ''
   });
 
-  const cargarProductos = async () => {
+  // ============================================
+  // 1. mostrarAlerta (estable)
+  // ============================================
+  const mostrarAlerta = useCallback((mensaje, tipo) => {
+    setAlerta({ mensaje, tipo });
+    setTimeout(() => setAlerta(null), 3000);
+  }, []);
+
+  // ============================================
+  // 2. cargarProductos con useCallback (evita recreación)
+  // ============================================
+  const cargarProductos = useCallback(async () => {
     try {
       const data = await obtenerProductos();
       setProductos(data);
@@ -32,24 +43,64 @@ const Inventario = () => {
       console.error('Error cargando productos:', error);
       mostrarAlerta('❌ Error al cargar productos', 'error');
     }
-  };
+  }, [mostrarAlerta]);
 
+  // ============================================
+  // 3. useEffect para carga inicial
+  // ============================================
   useEffect(() => {
-    cargarProductos();
-  }, []);
+    const timer = setTimeout(() => {
+      cargarProductos();
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [cargarProductos]);
 
+  // ============================================
+  // 4. useEffect para filtrar (optimizado)
+  // ============================================
   useEffect(() => {
-    if (!busqueda.trim()) {
-      setProductosFiltrados(productos);
-    } else {
-      const filtrados = productos.filter(p => 
-        p.codigo?.toLowerCase().includes(busqueda.toLowerCase()) ||
-        p.nombre?.toLowerCase().includes(busqueda.toLowerCase()) ||
-        p.marca?.toLowerCase().includes(busqueda.toLowerCase())
-      );
-      setProductosFiltrados(filtrados);
-    }
+    let active = true;
+    
+    const filtrarProductos = () => {
+      if (!active) return;
+      
+      if (!busqueda.trim()) {
+        setProductosFiltrados(productos);
+      } else {
+        const filtrados = productos.filter(p => 
+          p.codigo?.toLowerCase().includes(busqueda.toLowerCase()) ||
+          p.nombre?.toLowerCase().includes(busqueda.toLowerCase()) ||
+          p.marca?.toLowerCase().includes(busqueda.toLowerCase())
+        );
+        setProductosFiltrados(filtrados);
+      }
+    };
+    
+    filtrarProductos();
+    
+    return () => {
+      active = false;
+    };
   }, [busqueda, productos]);
+
+  // ============================================
+  // 5. RESTO DE FUNCIONES
+  // ============================================
+  const limpiarFormulario = () => {
+    setFormData({
+      codigo: '',
+      nombre: '',
+      marca: '',
+      stock: 1,
+      precioCompra: '',
+      precioVenta: '',
+      stockMinimo: 2,
+      notas: '',
+      foto: ''
+    });
+    const fileInput = document.getElementById('fotoInput');
+    if (fileInput) fileInput.value = '';
+  };
 
   const handleInputChange = (e) => {
     const { id, value, files } = e.target;
@@ -137,32 +188,10 @@ const Inventario = () => {
     }
   };
 
-  const mostrarAlerta = (mensaje, tipo) => {
-    setAlerta({ mensaje, tipo });
-    setTimeout(() => setAlerta(null), 3000);
-  };
-
-  const limpiarFormulario = () => {
-    setFormData({
-      codigo: '',
-      nombre: '',
-      marca: '',
-      stock: 1,
-      precioCompra: '',
-      precioVenta: '',
-      stockMinimo: 2,
-      notas: '',
-      foto: ''
-    });
-    const fileInput = document.getElementById('fotoInput');
-    if (fileInput) fileInput.value = '';
-  };
-
   return (
     <div className="container">
       {alerta && <Alerta {...alerta} onClose={() => setAlerta(null)} />}
       
-      {/* Header con logo */}
       <div style={{ 
         display: 'flex', 
         alignItems: 'center', 
@@ -175,10 +204,10 @@ const Inventario = () => {
           <img 
             src={logo} 
             alt="FRANCO'S LOCK" 
-            style={{ height: '150px', width: 'auto', borderRadius: '5px' }} 
+            style={{ height: '50px', width: 'auto', borderRadius: '5px' }} 
           />
           <span style={{ fontSize: '22px', fontWeight: 'bold', color: '#0066cc' }}>
-            FRANCO'SLOCK
+            FRANCO'S LOCK
           </span>
         </div>
         <div style={{ background: '#f0f7ff', padding: '8px 15px', borderRadius: '20px' }}>
@@ -188,7 +217,6 @@ const Inventario = () => {
 
       <h1>📋 Control de Inventario</h1>
       
-      {/* Tabla de productos */}
       <div style={{ marginBottom: '40px' }}>
         <h2>📦 Stock Actual</h2>
         
@@ -210,7 +238,6 @@ const Inventario = () => {
         />
       </div>
       
-      {/* Formulario para agregar productos */}
       <div className="form-container">
         <h2>➕ Agregar Nuevo Producto</h2>
         
@@ -320,13 +347,13 @@ const Inventario = () => {
           </div>
           
           <div style={{ textAlign: 'center', marginTop: '20px' }}>
-            <button type="submit" className="primary" style={{ padding: '12px 30px' }}>
+            <button type="submit" className="primary" style={{ padding: '12px 40px', fontSize: '16px' }}>
               ✅ GUARDAR PRODUCTO
             </button>
             <button 
               type="button" 
               onClick={limpiarFormulario} 
-              style={{ background: '#666', padding: '12px 30px' }}
+              style={{ background: '#666', padding: '12px 40px', fontSize: '16px' }}
             >
               🧹 LIMPIAR
             </button>
