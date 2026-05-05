@@ -5,7 +5,7 @@ const TablaProductos = ({
   productos, 
   onActualizarStock, 
   onEliminar, 
-  onEditar,  // ← NUEVO: función para editar
+  onEditar,  // ← Función para editar
   onVerFoto,
   modalFoto,
   setModalFoto
@@ -102,7 +102,11 @@ const TablaProductos = ({
                       style={{ 
                         background: '#28a745',
                         padding: '8px 12px',
-                        fontSize: '14px'
+                        fontSize: '14px',
+                        borderRadius: '5px',
+                        cursor: 'pointer',
+                        border: 'none',
+                        color: 'white'
                       }}
                       title="Agregar uno al stock"
                     >
@@ -114,7 +118,10 @@ const TablaProductos = ({
                         background: '#ffc107',
                         color: '#000',
                         padding: '8px 12px',
-                        fontSize: '14px'
+                        fontSize: '14px',
+                        borderRadius: '5px',
+                        cursor: 'pointer',
+                        border: 'none'
                       }}
                       title="Quitar uno del stock"
                       disabled={producto.stock <= 0}
@@ -122,11 +129,15 @@ const TablaProductos = ({
                       -1
                     </button>
                     <button 
-                      onClick={() => onEditar(producto)}  // ← NUEVO: botón editar
+                      onClick={() => onEditar && onEditar(producto)}
                       style={{ 
                         background: '#0066cc',
                         padding: '8px 12px',
-                        fontSize: '14px'
+                        fontSize: '14px',
+                        borderRadius: '5px',
+                        cursor: 'pointer',
+                        border: 'none',
+                        color: 'white'
                       }}
                       title="Editar producto"
                     >
@@ -137,7 +148,11 @@ const TablaProductos = ({
                       style={{ 
                         background: '#dc3545',
                         padding: '8px 12px',
-                        fontSize: '14px'
+                        fontSize: '14px',
+                        borderRadius: '5px',
+                        cursor: 'pointer',
+                        border: 'none',
+                        color: 'white'
                       }}
                       title="Eliminar producto"
                     >
