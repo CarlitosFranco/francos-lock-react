@@ -256,6 +256,27 @@ const Inventario = () => {
       </div>
 
       <h1>📋 Control de Inventario</h1>
+
+      {/* Tarjetas de estadísticas - NUEVO */}
+      <div className="stats-grid">
+        <div className="stat-card">
+          <div className="stat-icon">📦</div>
+          <div className="stat-value">{productos.length}</div>
+          <div className="stat-label">Total Productos</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-icon">⚠️</div>
+          <div className="stat-value">{productos.filter(p => p.stock <= p.stockMinimo).length}</div>
+          <div className="stat-label">Stock Bajo</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-icon">💰</div>
+          <div className="stat-value">
+            S/ {productos.reduce((sum, p) => sum + (p.precioVenta * p.stock), 0).toFixed(0)}
+          </div>
+          <div className="stat-label">Valor Inventario</div>
+        </div>
+      </div>
       
       {/* Tabla de productos */}
       <div style={{ marginBottom: '40px' }}>
