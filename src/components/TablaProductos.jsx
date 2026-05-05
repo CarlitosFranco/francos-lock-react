@@ -1,27 +1,30 @@
-import React from 'react';
+import React, { useState } from 'react';
 import ModalFoto from './ModalFoto';
 
 const TablaProductos = ({ 
   productos, 
   onActualizarStock, 
   onEliminar, 
-  onEditar,  // ← Función para editar
+  onEditar,
   onVerFoto,
   modalFoto,
   setModalFoto
 }) => {
   
+  const [hoverFoto, setHoverFoto] = useState(null);
+
   if (!productos || productos.length === 0) {
     return (
       <div style={{ 
         textAlign: 'center', 
-        padding: '50px', 
-        background: '#f8f9fa',
-        borderRadius: '8px',
-        margin: '20px 0'
+        padding: '60px', 
+        background: 'linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%)',
+        borderRadius: '16px',
+        margin: '20px 0',
+        border: '1px dashed #0066cc'
       }}>
-        <span style={{ fontSize: '48px', display: 'block', marginBottom: '10px' }}>📭</span>
-        <h3 style={{ color: '#666' }}>No hay productos en el inventario</h3>
+        <span style={{ fontSize: '64px', display: 'block', marginBottom: '20px' }}>📭</span>
+        <h3 style={{ color: '#666', marginBottom: '10px' }}>No hay productos en el inventario</h3>
         <p style={{ color: '#999' }}>Agrega tu primer producto usando el formulario de abajo</p>
       </div>
     );
@@ -29,18 +32,18 @@ const TablaProductos = ({
 
   return (
     <>
-      <div style={{ overflowX: 'auto' }}>
+      <div style={{ overflowX: 'auto', borderRadius: '12px' }}>
         <table>
           <thead>
             <tr>
-              <th>FOTO</th>
+              <th style={{ textAlign: 'center', width: '100px' }}>📷 FOTO</th>
               <th>CÓDIGO</th>
               <th>NOMBRE</th>
               <th>MARCA</th>
-              <th>STOCK</th>
-              <th>P. COMPRA</th>
-              <th>P. VENTA</th>
-              <th>ACCIONES</th>
+              <th style={{ textAlign: 'center' }}>STOCK</th>
+              <th style={{ textAlign: 'right' }}>P. COMPRA</th>
+              <th style={{ textAlign: 'right' }}>P. VENTA</th>
+              <th style={{ textAlign: 'center' }}>ACCIONES</th>
             </tr>
           </thead>
           <tbody>
@@ -48,27 +51,65 @@ const TablaProductos = ({
               <tr 
                 key={producto.codigo} 
                 className={producto.stock <= producto.stockMinimo ? 'bajo-stock' : ''}
+                style={{ transition: 'background 0.2s' }}
               >
-                <td>
+                <td style={{ textAlign: 'center' }}>
                   {producto.foto ? (
-                    <img 
-                      src={producto.foto} 
-                      className="foto-preview" 
-                      onClick={() => onVerFoto(producto.foto)}
-                      alt={producto.nombre}
-                      title="Click para ver imagen grande"
-                    />
+                    <div className="foto-container" style={{ position: 'relative', display: 'inline-block' }}>
+                      <img 
+                        src={producto.foto} 
+                        className="foto-producto"
+                        onClick={() => onVerFoto(producto.foto)}
+                        alt={producto.nombre}
+                        style={{
+                          width: '75px',
+                          height: '75px',
+                          objectFit: 'cover',
+                          borderRadius: '12px',
+                          cursor: 'pointer',
+                          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                          boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+                          border: hoverFoto === producto.codigo ? '2px solid #0066cc' : '2px solid transparent'
+                        }}
+                        onMouseEnter={(e) => {
+                          setHoverFoto(producto.codigo);
+                          e.currentTarget.style.transform = 'scale(1.1)';
+                          e.currentTarget.style.boxShadow = '0 12px 24px rgba(0,102,204,0.3)';
+                        }}
+                        onMouseLeave={(e) => {
+                          setHoverFoto(null);
+                          e.currentTarget.style.transform = 'scale(1)';
+                          e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)';
+                        }}
+                      />
+                      <div className="foto-badge" style={{
+                        position: 'absolute',
+                        bottom: '5px',
+                        right: '5px',
+                        background: '#0066cc',
+                        color: 'white',
+                        borderRadius: '20px',
+                        padding: '2px 6px',
+                        fontSize: '10px',
+                        opacity: hoverFoto === producto.codigo ? 1 : 0,
+                        transition: 'opacity 0.3s',
+                        pointerEvents: 'none'
+                      }}>
+                        🔍
+                      </div>
+                    </div>
                   ) : (
-                    <div style={{ 
-                      width: '60px', 
-                      height: '60px', 
-                      background: '#f0f0f0',
-                      borderRadius: '5px',
+                    <div className="foto-placeholder" style={{
+                      width: '75px',
+                      height: '75px',
+                      background: 'linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%)',
+                      borderRadius: '12px',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      fontSize: '24px',
-                      color: '#999'
+                      fontSize: '32px',
+                      color: '#999',
+                      boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.05)'
                     }}>
                       📷
                     </div>
@@ -77,8 +118,8 @@ const TablaProductos = ({
                 <td><strong>{producto.codigo}</strong></td>
                 <td>{producto.nombre}</td>
                 <td>{producto.marca || '-'}</td>
-                <td>
-                  <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <td style={{ textAlign: 'center' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                     <span style={{ 
                       fontWeight: 'bold', 
                       fontSize: '18px',
@@ -86,75 +127,92 @@ const TablaProductos = ({
                     }}>
                       {producto.stock}
                     </span>
-                    <small style={{ color: '#666' }}>
+                    <small style={{ color: '#666', fontSize: '10px' }}>
                       Mín: {producto.stockMinimo}
                     </small>
                   </div>
                 </td>
-                <td>S/ {producto.precioCompra?.toFixed(2) || '0.00'}</td>
-                <td style={{ fontWeight: 'bold', color: '#0066cc' }}>
+                <td style={{ textAlign: 'right' }}>S/ {producto.precioCompra?.toFixed(2) || '0.00'}</td>
+                <td style={{ textAlign: 'right', fontWeight: 'bold', color: '#0066cc' }}>
                   S/ {producto.precioVenta?.toFixed(2) || '0.00'}
                 </td>
-                <td>
-                  <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap' }}>
+                <td style={{ textAlign: 'center' }}>
+                  <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap' }}>
                     <button 
                       onClick={() => onActualizarStock(producto, 1)}
-                      style={{ 
+                      className="btn-stock btn-stock-up"
+                      title="Aumentar stock"
+                      style={{
                         background: '#28a745',
-                        padding: '8px 12px',
+                        padding: '8px 14px',
                         fontSize: '14px',
-                        borderRadius: '5px',
+                        borderRadius: '8px',
                         cursor: 'pointer',
                         border: 'none',
-                        color: 'white'
+                        color: 'white',
+                        fontWeight: 'bold',
+                        transition: 'all 0.2s'
                       }}
-                      title="Agregar uno al stock"
+                      onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.05)'}
+                      onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
                     >
                       +1
                     </button>
                     <button 
                       onClick={() => onActualizarStock(producto, -1)}
-                      style={{ 
+                      className="btn-stock btn-stock-down"
+                      title="Disminuir stock"
+                      disabled={producto.stock <= 0}
+                      style={{
                         background: '#ffc107',
                         color: '#000',
-                        padding: '8px 12px',
+                        padding: '8px 14px',
                         fontSize: '14px',
-                        borderRadius: '5px',
-                        cursor: 'pointer',
-                        border: 'none'
+                        borderRadius: '8px',
+                        cursor: producto.stock <= 0 ? 'not-allowed' : 'pointer',
+                        border: 'none',
+                        fontWeight: 'bold',
+                        transition: 'all 0.2s',
+                        opacity: producto.stock <= 0 ? 0.5 : 1
                       }}
-                      title="Quitar uno del stock"
-                      disabled={producto.stock <= 0}
                     >
                       -1
                     </button>
                     <button 
                       onClick={() => onEditar && onEditar(producto)}
-                      style={{ 
+                      className="btn-edit"
+                      title="Editar producto"
+                      style={{
                         background: '#0066cc',
-                        padding: '8px 12px',
+                        padding: '8px 14px',
                         fontSize: '14px',
-                        borderRadius: '5px',
+                        borderRadius: '8px',
                         cursor: 'pointer',
                         border: 'none',
-                        color: 'white'
+                        color: 'white',
+                        transition: 'all 0.2s'
                       }}
-                      title="Editar producto"
+                      onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.05)'}
+                      onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
                     >
                       ✏️
                     </button>
                     <button 
                       onClick={() => onEliminar(producto.codigo)}
-                      style={{ 
+                      className="btn-delete"
+                      title="Eliminar producto"
+                      style={{
                         background: '#dc3545',
-                        padding: '8px 12px',
+                        padding: '8px 14px',
                         fontSize: '14px',
-                        borderRadius: '5px',
+                        borderRadius: '8px',
                         cursor: 'pointer',
                         border: 'none',
-                        color: 'white'
+                        color: 'white',
+                        transition: 'all 0.2s'
                       }}
-                      title="Eliminar producto"
+                      onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.05)'}
+                      onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
                     >
                       🗑️
                     </button>
@@ -166,31 +224,36 @@ const TablaProductos = ({
         </table>
       </div>
 
-      {/* Leyenda de colores */}
+      {/* Leyenda de colores mejorada */}
       <div style={{ 
         display: 'flex', 
-        gap: '20px', 
+        gap: '30px', 
         justifyContent: 'flex-end',
-        marginTop: '15px',
-        padding: '10px',
+        marginTop: '20px',
+        padding: '12px 20px',
         background: '#f8f9fa',
-        borderRadius: '5px',
-        fontSize: '12px'
+        borderRadius: '12px',
+        fontSize: '12px',
+        flexWrap: 'wrap'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-          <div style={{ width: '20px', height: '20px', background: '#ffebee', border: '1px solid #dc3545' }}></div>
-          <span>Stock bajo (menor al mínimo)</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div style={{ width: '16px', height: '16px', background: '#ffebee', borderLeft: '3px solid #dc3545', borderRadius: '3px' }}></div>
+          <span>Stock bajo</span>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-          <span style={{ color: '#28a745' }}>⬆️</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ color: '#28a745', fontSize: '16px' }}>⬆️</span>
           <span>Incrementar stock</span>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-          <span style={{ color: '#0066cc' }}>✏️</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ color: '#ffc107', fontSize: '16px' }}>⬇️</span>
+          <span>Reducir stock</span>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ color: '#0066cc', fontSize: '14px' }}>✏️</span>
           <span>Editar producto</span>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-          <span style={{ color: '#dc3545' }}>🗑️</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ color: '#dc3545', fontSize: '14px' }}>🗑️</span>
           <span>Eliminar producto</span>
         </div>
       </div>

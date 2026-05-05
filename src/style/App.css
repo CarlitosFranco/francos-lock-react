@@ -264,6 +264,139 @@ h2::before {
 }
 
 /* ============================================
+   ESTILOS MEJORADOS PARA FOTOS DE PRODUCTOS
+   ============================================ */
+
+/* Contenedor de la foto */
+.foto-container {
+  position: relative;
+  display: inline-block;
+}
+
+/* Estilo base de la foto */
+.foto-producto {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  border: 2px solid transparent;
+}
+
+.foto-producto:hover {
+  transform: scale(1.15);
+  box-shadow: 0 12px 24px rgba(0,102,204,0.3);
+  border-color: #0066cc;
+  z-index: 10;
+  position: relative;
+}
+
+/* Badge de zoom */
+.foto-badge {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  background: rgba(0,102,204,0.9);
+  color: white;
+  border-radius: 20px;
+  padding: 2px 6px;
+  font-size: 10px;
+  opacity: 0;
+  transition: opacity 0.3s;
+  backdrop-filter: blur(2px);
+}
+
+.foto-container:hover .foto-badge {
+  opacity: 1;
+}
+
+/* Placeholder cuando no hay foto */
+.foto-placeholder {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  color: #999;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+  transition: all 0.3s;
+}
+
+.foto-placeholder:hover {
+  transform: scale(1.05);
+  background: linear-gradient(135deg, #e8e8e8 0%, #d0d0d0 100%);
+}
+
+/* Modal de foto mejorado */
+.modal-foto {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  cursor: pointer;
+  backdrop-filter: blur(5px);
+  animation: fadeIn 0.3s ease;
+}
+
+.modal-foto-content {
+  max-width: 90vw;
+  max-height: 90vh;
+  background: white;
+  padding: 20px;
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+  animation: zoomIn 0.3s ease;
+}
+
+.modal-foto-content img {
+  max-width: 100%;
+  max-height: 80vh;
+  border-radius: 12px;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes zoomIn {
+  from { transform: scale(0.9); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+/* Efecto de brillo al pasar el mouse */
+.foto-producto {
+  position: relative;
+  overflow: hidden;
+}
+
+.foto-producto::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.5s;
+}
+
+.foto-producto:hover::after {
+  left: 100%;
+}
+
+/* ============================================
    BOTONES MEJORADOS
    ============================================ */
 button {
