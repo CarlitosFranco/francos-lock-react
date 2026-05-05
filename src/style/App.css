@@ -1,5 +1,5 @@
 /* ========================================
-   FRANCO'S LOCK - ESTILOS GLOBALES
+   FRANCO'S LOCK - ESTILOS MEJORADOS
    Colores: Azul (#0066cc), Negro, Blanco
    ======================================== */
 
@@ -7,19 +7,25 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: 'Segoe UI', Arial, sans-serif;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 body {
-  background: #f5f5f5;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+  min-height: 100vh;
 }
 
-/* Barra de navegación - Negro */
+/* ============================================
+   BARRA DE NAVEGACIÓN MEJORADA
+   ============================================ */
 .navbar {
   background: #000000;
   overflow: hidden;
   margin-bottom: 25px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
 .navbar a {
@@ -27,10 +33,12 @@ body {
   display: block;
   color: white;
   text-align: center;
-  padding: 15px 20px;
+  padding: 16px 24px;
   text-decoration: none;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 500;
+  transition: all 0.3s ease;
+  position: relative;
 }
 
 .navbar a:hover {
@@ -41,59 +49,182 @@ body {
   background: #0066cc;
 }
 
-.navbar .logout {
-  float: right;
+.navbar a.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 30px;
+  height: 3px;
+  background: white;
+  border-radius: 3px;
 }
 
-/* Contenedor principal */
+.navbar .logout {
+  float: right;
+  background: #dc3545;
+}
+
+.navbar .logout:hover {
+  background: #c82333;
+}
+
+/* ============================================
+   CONTENEDOR PRINCIPAL
+   ============================================ */
 .container {
   max-width: 1400px;
   margin: 20px auto;
   background: white;
-  padding: 25px;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  padding: 30px;
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+  animation: fadeInUp 0.5s ease-out;
 }
 
-/* Encabezado con nombre de empresa */
-.empresa-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-  padding-bottom: 10px;
-  border-bottom: 2px solid #0066cc;
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.empresa-nombre {
-  font-size: 24px;
+/* ============================================
+   TARJETAS DE ESTADÍSTICAS (NUEVO)
+   ============================================ */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.stat-card {
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  transition: all 0.3s ease;
+  border-left: 4px solid #0066cc;
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0,102,204,0.15);
+}
+
+.stat-card .stat-icon {
+  font-size: 32px;
+  margin-bottom: 10px;
+}
+
+.stat-card .stat-value {
+  font-size: 32px;
   font-weight: bold;
-  color: #000;
-}
-
-.empresa-nombre span {
   color: #0066cc;
 }
 
-/* Títulos */
+.stat-card .stat-label {
+  color: #666;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* ============================================
+   ENCABEZADO CON LOGO
+   ============================================ */
+.empresa-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 3px solid #0066cc;
+}
+
+.empresa-header .logo-area {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.empresa-header .logo-area img {
+  height: 55px;
+  width: auto;
+  border-radius: 10px;
+  transition: transform 0.3s ease;
+}
+
+.empresa-header .logo-area img:hover {
+  transform: scale(1.05);
+}
+
+.empresa-header .logo-area h1 {
+  font-size: 24px;
+  color: #0066cc;
+  margin: 0;
+}
+
+.empresa-header .usuario-info {
+  background: linear-gradient(135deg, #e8f4fd 0%, #d4e8f7 100%);
+  padding: 8px 18px;
+  border-radius: 30px;
+  font-weight: 500;
+  color: #0066cc;
+}
+
+/* ============================================
+   TÍTULOS
+   ============================================ */
 h1 {
   color: #0066cc;
   margin-bottom: 25px;
+  font-size: 28px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 h2 {
   color: #000;
   margin: 20px 0 15px 0;
   font-size: 20px;
+  position: relative;
+  padding-left: 12px;
 }
 
-/* Formularios */
+h2::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 20px;
+  background: #0066cc;
+  border-radius: 2px;
+}
+
+/* ============================================
+   FORMULARIO MEJORADO
+   ============================================ */
 .form-container {
-  background: #f8f9fa;
+  background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
   padding: 25px;
-  border-radius: 8px;
+  border-radius: 12px;
   margin: 20px 0;
-  border: 1px solid #e0e0e0;
+  border: 1px solid rgba(0,102,204,0.2);
+  transition: all 0.3s ease;
+}
+
+.form-container:hover {
+  box-shadow: 0 5px 20px rgba(0,0,0,0.08);
 }
 
 .form-grid {
@@ -102,26 +233,26 @@ h2 {
   gap: 20px;
 }
 
-.form-group {
-  margin-bottom: 15px;
-}
-
 .form-group label {
   display: block;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
   font-weight: 600;
   color: #000;
-  font-size: 14px;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .form-group input,
 .form-group select,
 .form-group textarea {
   width: 100%;
-  padding: 10px;
+  padding: 12px;
   border: 2px solid #e0e0e0;
-  border-radius: 5px;
+  border-radius: 8px;
   font-size: 14px;
+  transition: all 0.3s;
+  background: white;
 }
 
 .form-group input:focus,
@@ -129,27 +260,46 @@ h2 {
 .form-group textarea:focus {
   outline: none;
   border-color: #0066cc;
-  box-shadow: 0 0 5px rgba(0,102,204,0.3);
+  box-shadow: 0 0 0 3px rgba(0,102,204,0.1);
 }
 
-/* Botones */
+/* ============================================
+   BOTONES MEJORADOS
+   ============================================ */
 button {
   background: #000000;
   color: white;
-  padding: 12px 25px;
+  padding: 12px 28px;
   border: none;
-  border-radius: 5px;
+  border-radius: 8px;
   cursor: pointer;
   font-size: 14px;
   font-weight: 600;
   margin: 5px;
   transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+
+button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.5s;
+}
+
+button:hover::before {
+  left: 100%;
 }
 
 button:hover {
-  background: #333333;
+  background: #1a1a1a;
   transform: translateY(-2px);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
 }
 
 button.primary {
@@ -160,15 +310,21 @@ button.primary:hover {
   background: #0052a3;
 }
 
-/* Tablas */
+button:active {
+  transform: translateY(0);
+}
+
+/* ============================================
+   TABLA MEJORADA
+   ============================================ */
 table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 25px;
+  margin-top: 20px;
   background: white;
-  border-radius: 8px;
+  border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
 }
 
 th {
@@ -177,69 +333,85 @@ th {
   padding: 15px 12px;
   text-align: left;
   font-weight: 600;
-  font-size: 14px;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 td {
-  padding: 12px;
-  border-bottom: 1px solid #e0e0e0;
+  padding: 14px 12px;
+  border-bottom: 1px solid #eef2f6;
   color: #333;
+  transition: background 0.2s ease;
 }
 
-tr:hover {
+tr:hover td {
   background: #f0f7ff;
+}
+
+tr:last-child td {
+  border-bottom: none;
 }
 
 /* Stock bajo */
 .bajo-stock {
-  background: #fff0f0;
+  background: linear-gradient(90deg, #fff5f5 0%, #ffffff 100%);
   border-left: 4px solid #dc3545;
 }
 
-/* Fotos */
+/* ============================================
+   FOTOS DE PRODUCTOS
+   ============================================ */
 .foto-preview {
-  width: 80px;
-  height: 80px;
-  border-radius: 5px;
+  width: 70px;
+  height: 70px;
+  border-radius: 8px;
   cursor: pointer;
   object-fit: cover;
   border: 2px solid #0066cc;
   transition: all 0.3s;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
 .foto-preview:hover {
-  transform: scale(1.5);
-  box-shadow: 0 4px 15px rgba(0,102,204,0.4);
-  z-index: 100;
+  transform: scale(1.2);
+  box-shadow: 0 8px 20px rgba(0,102,204,0.3);
+  z-index: 10;
   position: relative;
 }
 
-/* Buscador */
+/* ============================================
+   BUSCADOR MEJORADO
+   ============================================ */
 .buscador {
   width: 100%;
-  padding: 15px 20px;
+  padding: 14px 20px 14px 50px;
   margin: 20px 0;
   border: 2px solid #e0e0e0;
-  border-radius: 30px;
+  border-radius: 50px;
   font-size: 16px;
-  padding-left: 50px;
-  background: white url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%23999" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>') no-repeat 20px center;
+  transition: all 0.3s;
+  background: white url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="%23999" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>') no-repeat 18px center;
 }
 
 .buscador:focus {
   border-color: #0066cc;
   outline: none;
+  box-shadow: 0 0 0 3px rgba(0,102,204,0.1);
 }
 
-/* Login */
+/* ============================================
+   LOGIN MEJORADO
+   ============================================ */
 .login-container {
-  max-width: 400px;
+  max-width: 420px;
   margin: 100px auto;
   background: white;
   padding: 40px;
-  border-radius: 10px;
-  box-shadow: 0 5px 30px rgba(0,0,0,0.2);
+  border-radius: 20px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.2);
   border-top: 5px solid #0066cc;
+  animation: fadeInUp 0.6s ease-out;
 }
 
 .login-container h1 {
@@ -252,21 +424,24 @@ tr:hover {
   text-align: center;
   color: #0066cc;
   margin-bottom: 30px;
+  font-size: 16px;
   font-weight: normal;
 }
 
 .login-container input {
   width: 100%;
   padding: 15px;
-  margin: 10px 0;
+  margin: 12px 0;
   border: 2px solid #e0e0e0;
-  border-radius: 5px;
+  border-radius: 10px;
   font-size: 16px;
+  transition: all 0.3s;
 }
 
 .login-container input:focus {
   border-color: #0066cc;
   outline: none;
+  box-shadow: 0 0 0 3px rgba(0,102,204,0.1);
 }
 
 .login-container button {
@@ -275,9 +450,12 @@ tr:hover {
   background: #0066cc;
   font-size: 18px;
   margin-top: 20px;
+  border-radius: 10px;
 }
 
-/* Modal para fotos */
+/* ============================================
+   MODAL MEJORADO
+   ============================================ */
 .modal {
   display: none;
   position: fixed;
@@ -285,20 +463,182 @@ tr:hover {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0,0,0,0.9);
+  background: rgba(0,0,0,0.85);
   justify-content: center;
   align-items: center;
   z-index: 1000;
+  backdrop-filter: blur(5px);
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .modal-content {
   background: white;
-  padding: 25px;
-  border-radius: 10px;
+  padding: 20px;
+  border-radius: 16px;
   border: 3px solid #0066cc;
+  animation: zoomIn 0.3s ease;
+}
+
+@keyframes zoomIn {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 .modal img {
   max-width: 600px;
   max-height: 600px;
+  border-radius: 8px;
+}
+
+/* ============================================
+   BADGES PARA TIPOS DE MOVIMIENTO
+   ============================================ */
+.tipo-badge {
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: bold;
+  display: inline-block;
+}
+
+.tipo-entrada {
+  background: #d4edda;
+  color: #155724;
+  border-left: 3px solid #28a745;
+}
+
+.tipo-salida {
+  background: #f8d7da;
+  color: #721c24;
+  border-left: 3px solid #dc3545;
+}
+
+.tipo-venta {
+  background: #cce5ff;
+  color: #004085;
+  border-left: 3px solid #0066cc;
+}
+
+.tipo-alta {
+  background: #fff3cd;
+  color: #856404;
+  border-left: 3px solid #ffc107;
+}
+
+.tipo-eliminacion {
+  background: #e2e3e5;
+  color: #383d41;
+  border-left: 3px solid #6c757d;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 768px) {
+  .container {
+    padding: 15px;
+    margin: 10px;
+    border-radius: 12px;
+  }
+  
+  .navbar a {
+    float: none;
+    width: 100%;
+    text-align: center;
+    padding: 12px;
+  }
+  
+  .navbar .logout {
+    float: none;
+  }
+  
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .empresa-header {
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+  }
+  
+  th, td {
+    padding: 10px 8px;
+    font-size: 12px;
+  }
+  
+  table {
+    display: block;
+    overflow-x: auto;
+  }
+  
+  .modal img {
+    max-width: 90vw;
+    max-height: 70vh;
+  }
+}
+
+/* ============================================
+   SCROLLBAR PERSONALIZADA
+   ============================================ */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #0066cc;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #004d99;
+}
+
+/* ============================================
+   VERSIÓN IMPRESIÓN
+   ============================================ */
+@media print {
+  .navbar, button, .buscador, .form-container, .modal, .stats-grid {
+    display: none !important;
+  }
+  
+  body, .container {
+    background: white;
+    margin: 0;
+    padding: 10px;
+    box-shadow: none;
+  }
+  
+  table {
+    box-shadow: none;
+    border: 1px solid #ddd;
+  }
+  
+  th {
+    background: #f0f0f0;
+    color: black;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
 }
