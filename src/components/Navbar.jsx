@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import logo from '../assets/logo.jpg';  // ← IMPORTAMOS EL LOGO
+import logo from '../assets/logo.jpg';
 
 const Navbar = () => {
   const location = useLocation();
@@ -29,7 +29,7 @@ const Navbar = () => {
           src={logo} 
           alt="FRANCO'S LOCK" 
           style={{ 
-            height: '60px', 
+            height: '50px', 
             width: 'auto',
             borderRadius: '5px',
             objectFit: 'contain'
@@ -42,7 +42,7 @@ const Navbar = () => {
           borderLeft: '2px solid #0066cc',
           paddingLeft: '15px'
         }}>
-          FRANCO'SLOCK
+          FRANCO'S LOCK
         </span>
       </div>
       

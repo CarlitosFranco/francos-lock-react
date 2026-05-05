@@ -1,8 +1,7 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import './style/App.css';
 
-// Importaciones CORREGIDAS (sin llaves)
 import Login from './pages/Login';
 import Inventario from './pages/Inventario';
 import Historial from './pages/Historial';
@@ -15,7 +14,7 @@ const RutaProtegida = ({ children }) => {
 
 function App() {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <Navbar />
       <Routes>
         <Route path="/" element={<Login />} />
@@ -23,7 +22,7 @@ function App() {
         <Route path="/historial" element={<RutaProtegida><Historial /></RutaProtegida>} />
         <Route path="/facturacion" element={<RutaProtegida><Facturacion /></RutaProtegida>} />
       </Routes>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
 
