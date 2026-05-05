@@ -1,9 +1,8 @@
 // ========================================
 // FRANCO'S LOCK - SERVICIO DE BASE DE DATOS
-// IndexedDB - Igual que tu sistema actual
 // ========================================
 
-const DB_NOMBRE = "FrancosLockReact";
+const DB_NOMBRE = "InventarioCerrajeria";  // ← CORREGIDO: mismo nombre que usas en la carga
 const DB_VERSION = 1;
 
 let db = null;
@@ -39,6 +38,7 @@ export const inicializarDB = () => {
         const store = db.createObjectStore("productos", { keyPath: "codigo" });
         store.createIndex("nombre", "nombre", { unique: false });
         store.createIndex("marca", "marca", { unique: false });
+        console.log("✅ Store 'productos' creado");
       }
 
       // Store de historial
@@ -47,6 +47,7 @@ export const inicializarDB = () => {
         store.createIndex("codigo", "codigo", { unique: false });
         store.createIndex("fecha", "fecha", { unique: false });
         store.createIndex("tipo", "tipo", { unique: false });
+        console.log("✅ Store 'historial' creado");
       }
 
       // Store de documentos (facturas/boletas)
@@ -54,9 +55,10 @@ export const inicializarDB = () => {
         const store = db.createObjectStore("documentos", { keyPath: "id", autoIncrement: true });
         store.createIndex("folio", "folio", { unique: true });
         store.createIndex("fecha", "fecha", { unique: false });
+        console.log("✅ Store 'documentos' creado");
       }
 
-      console.log("✅ Estructura de DB creada");
+      console.log("✅ Estructura de DB completa");
     };
   });
 };
@@ -67,9 +69,32 @@ export const inicializarDB = () => {
 export const obtenerProductos = async () => {
   const database = await inicializarDB();
   return new Promise((resolve, reject) => {
+    try {
+      const transaction = database.transaction(["productos"], "readonly");
+      const store = transaction.objectStore("productos");
+      const request = store.getAll();
+
+      request.onsuccess = () => {
+        console.log(`📦 Productos obtenidos: ${request.result.length}`);
+        resolve(request.result);
+      };
+      request.onerror = () => reject(request.error);
+    } catch (error) {
+      console.error("Error al obtener productos:", error);
+      resolve([]);
+    }
+  });
+};
+
+/**
+ * Obtiene un producto por su código
+ */
+export const obtenerProductoPorCodigo = async (codigo) => {
+  const database = await inicializarDB();
+  return new Promise((resolve, reject) => {
     const transaction = database.transaction(["productos"], "readonly");
     const store = transaction.objectStore("productos");
-    const request = store.getAll();
+    const request = store.get(codigo);
 
     request.onsuccess = () => resolve(request.result);
     request.onerror = () => reject(request.error);
@@ -85,7 +110,7 @@ export const guardarProducto = async (producto) => {
     const transaction = database.transaction(["productos", "historial"], "readwrite");
     const store = transaction.objectStore("productos");
     
-    const request = store.put(producto); // put actualiza o agrega
+    const request = store.put(producto);
 
     request.onsuccess = () => {
       // Registrar en historial
@@ -115,7 +140,6 @@ export const eliminarProducto = async (codigo) => {
     const transaction = database.transaction(["productos", "historial"], "readwrite");
     const store = transaction.objectStore("productos");
     
-    // Primero obtener el producto para tener el nombre
     const getRequest = store.get(codigo);
     
     getRequest.onsuccess = () => {
@@ -129,7 +153,6 @@ export const eliminarProducto = async (codigo) => {
       const deleteRequest = store.delete(codigo);
       
       deleteRequest.onsuccess = () => {
-        // Registrar en historial
         const historialStore = transaction.objectStore("historial");
         historialStore.add({
           codigo: codigo,
@@ -160,10 +183,8 @@ export const obtenerHistorial = async (filtros = {}) => {
     request.onsuccess = () => {
       let resultados = request.result;
       
-      // Ordenar por fecha descendente
       resultados.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
       
-      // Aplicar filtros
       if (filtros.codigo) {
         resultados = resultados.filter(r => 
           r.codigo?.toLowerCase().includes(filtros.codigo.toLowerCase())
