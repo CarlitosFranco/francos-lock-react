@@ -10,6 +10,7 @@ const Inventario = () => {
   const [busqueda, setBusqueda] = useState('');
   const [modalFoto, setModalFoto] = useState(null);
   const [alerta, setAlerta] = useState(null);
+  const [cargando, setCargando] = useState(true);
   
   const [formData, setFormData] = useState({
     codigo: '',
@@ -24,84 +25,78 @@ const Inventario = () => {
   });
 
   // ============================================
-  // 1. mostrarAlerta (estable)
+  // FUNCIÓN PARA ORDENAR PRODUCTOS POR MARCA (ALFABÉTICO)
   // ============================================
-  const mostrarAlerta = useCallback((mensaje, tipo) => {
-    setAlerta({ mensaje, tipo });
-    setTimeout(() => setAlerta(null), 3000);
+  const ordenarPorMarca = useCallback((productosArray) => {
+    return [...productosArray].sort((a, b) => {
+      const marcaA = (a.marca || "").toLowerCase();
+      const marcaB = (b.marca || "").toLowerCase();
+      
+      if (marcaA < marcaB) return -1;
+      if (marcaA > marcaB) return 1;
+      
+      // Si la marca es igual, ordenar por nombre
+      const nombreA = (a.nombre || "").toLowerCase();
+      const nombreB = (b.nombre || "").toLowerCase();
+      if (nombreA < nombreB) return -1;
+      if (nombreA > nombreB) return 1;
+      return 0;
+    });
   }, []);
 
   // ============================================
-  // 2. cargarProductos con useCallback (evita recreación)
+  // FUNCIÓN PARA CARGAR PRODUCTOS
   // ============================================
   const cargarProductos = useCallback(async () => {
+    setCargando(true);
     try {
       const data = await obtenerProductos();
-      setProductos(data);
-      setProductosFiltrados(data);
+      const productosOrdenados = ordenarPorMarca(data);
+      setProductos(productosOrdenados);
+      setProductosFiltrados(productosOrdenados);
     } catch (error) {
-      console.error('Error cargando productos:', error);
-      mostrarAlerta('❌ Error al cargar productos', 'error');
+      console.error("❌ Error cargando productos:", error);
+    } finally {
+      setCargando(false);
     }
-  }, [mostrarAlerta]);
+  }, [ordenarPorMarca]);
 
   // ============================================
-  // 3. useEffect para carga inicial
+  // useEffect PARA CARGA INICIAL
   // ============================================
   useEffect(() => {
-    const timer = setTimeout(() => {
-      cargarProductos();
-    }, 300);
-    return () => clearTimeout(timer);
+    cargarProductos();
   }, [cargarProductos]);
 
   // ============================================
-  // 4. useEffect para filtrar (optimizado)
+  // useEffect PARA FILTRAR Y ORDENAR
   // ============================================
   useEffect(() => {
-    let active = true;
-    
-    const filtrarProductos = () => {
-      if (!active) return;
-      
-      if (!busqueda.trim()) {
-        setProductosFiltrados(productos);
-      } else {
-        const filtrados = productos.filter(p => 
-          p.codigo?.toLowerCase().includes(busqueda.toLowerCase()) ||
-          p.nombre?.toLowerCase().includes(busqueda.toLowerCase()) ||
-          p.marca?.toLowerCase().includes(busqueda.toLowerCase())
-        );
-        setProductosFiltrados(filtrados);
-      }
-    };
-    
-    filtrarProductos();
-    
-    return () => {
-      active = false;
-    };
-  }, [busqueda, productos]);
+    if (!busqueda.trim()) {
+      const ordenados = ordenarPorMarca(productos);
+      setProductosFiltrados(ordenados);
+    } else {
+      const filtrados = productos.filter(p => 
+        p.codigo?.toLowerCase().includes(busqueda.toLowerCase()) ||
+        p.nombre?.toLowerCase().includes(busqueda.toLowerCase()) ||
+        p.marca?.toLowerCase().includes(busqueda.toLowerCase())
+      );
+      const ordenados = ordenarPorMarca(filtrados);
+      setProductosFiltrados(ordenados);
+    }
+  }, [busqueda, productos, ordenarPorMarca]);
 
   // ============================================
-  // 5. RESTO DE FUNCIONES
+  // MOSTRAR ALERTA
   // ============================================
-  const limpiarFormulario = () => {
-    setFormData({
-      codigo: '',
-      nombre: '',
-      marca: '',
-      stock: 1,
-      precioCompra: '',
-      precioVenta: '',
-      stockMinimo: 2,
-      notas: '',
-      foto: ''
-    });
-    const fileInput = document.getElementById('fotoInput');
-    if (fileInput) fileInput.value = '';
+  const mostrarAlerta = (mensaje, tipo) => {
+    setAlerta({ mensaje, tipo });
+    setTimeout(() => setAlerta(null), 3000);
   };
 
+  // ============================================
+  // MANEJAR CAMBIOS EN FORMULARIO
+  // ============================================
   const handleInputChange = (e) => {
     const { id, value, files } = e.target;
     
@@ -116,6 +111,9 @@ const Inventario = () => {
     }
   };
 
+  // ============================================
+  // GUARDAR PRODUCTO
+  // ============================================
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -155,6 +153,9 @@ const Inventario = () => {
     }
   };
 
+  // ============================================
+  // ACTUALIZAR STOCK
+  // ============================================
   const actualizarStock = async (producto, cambio) => {
     const nuevoStock = producto.stock + cambio;
     if (nuevoStock < 0) {
@@ -175,6 +176,9 @@ const Inventario = () => {
     }
   };
 
+  // ============================================
+  // ELIMINAR PRODUCTO
+  // ============================================
   const eliminarProductoHandler = async (codigo) => {
     if (window.confirm('¿Estás seguro de eliminar este producto?')) {
       try {
@@ -188,10 +192,46 @@ const Inventario = () => {
     }
   };
 
+  // ============================================
+  // LIMPIAR FORMULARIO
+  // ============================================
+  const limpiarFormulario = () => {
+    setFormData({
+      codigo: '',
+      nombre: '',
+      marca: '',
+      stock: 1,
+      precioCompra: '',
+      precioVenta: '',
+      stockMinimo: 2,
+      notas: '',
+      foto: ''
+    });
+    const fileInput = document.getElementById('fotoInput');
+    if (fileInput) fileInput.value = '';
+  };
+
+  // ============================================
+  // PANTALLA DE CARGA
+  // ============================================
+  if (cargando) {
+    return (
+      <div className="container">
+        <div style={{ textAlign: 'center', padding: '50px' }}>
+          <h2>Cargando inventario...</h2>
+        </div>
+      </div>
+    );
+  }
+
+  // ============================================
+  // RENDER PRINCIPAL
+  // ============================================
   return (
     <div className="container">
       {alerta && <Alerta {...alerta} onClose={() => setAlerta(null)} />}
       
+      {/* Header con logo */}
       <div style={{ 
         display: 'flex', 
         alignItems: 'center', 
@@ -217,6 +257,7 @@ const Inventario = () => {
 
       <h1>📋 Control de Inventario</h1>
       
+      {/* Tabla de productos */}
       <div style={{ marginBottom: '40px' }}>
         <h2>📦 Stock Actual</h2>
         
@@ -238,6 +279,7 @@ const Inventario = () => {
         />
       </div>
       
+      {/* Formulario para agregar productos */}
       <div className="form-container">
         <h2>➕ Agregar Nuevo Producto</h2>
         
